@@ -1012,6 +1012,20 @@
 
 
             <a
+                href="<?php echo e(route('final-project.index')); ?>"
+                class="<?php echo e(request()->routeIs('final-project.*') ? 'active' : ''); ?>"
+            >
+
+                <i class="bi bi-list-check"></i>
+
+                <span class="label ms-2">
+                    Proyek Akhir
+                </span>
+
+            </a>
+
+
+            <a
                 href="<?php echo e(route('daily-progress.index')); ?>"
                 class="<?php echo e(request()->routeIs('daily-progress.*') ? 'active' : ''); ?>"
             >

@@ -1012,6 +1012,20 @@
 
 
             <a
+                href="{{ route('final-project.index') }}"
+                class="{{ request()->routeIs('final-project.*') ? 'active' : '' }}"
+            >
+
+                <i class="bi bi-list-check"></i>
+
+                <span class="label ms-2">
+                    Proyek Akhir
+                </span>
+
+            </a>
+
+
+            <a
                 href="{{ route('daily-progress.index') }}"
                 class="{{ request()->routeIs('daily-progress.*') ? 'active' : '' }}"
             >

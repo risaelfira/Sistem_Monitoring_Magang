@@ -6,6 +6,7 @@ use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\ReportProgressController;
 use App\Http\Controllers\SupportingDocumentController;
 use App\Http\Controllers\DailyProgressController;
+use App\Http\Controllers\FinalProjectTaskController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -200,6 +201,29 @@ Route::middleware('auth')->group(function () {
             ) / 2
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | RINGKASAN PROYEK AKHIR
+        |--------------------------------------------------------------------------
+        */
+
+        $projectTasks = \App\Models\FinalProjectTask::where(
+            'user_id',
+            $user->id
+        )->get();
+
+        $projectDone = $projectTasks->where('status', 'Done')->count();
+        $projectTotal = $projectTasks->count();
+        $projectOnProgress = $projectTasks->where('status', 'On Progress')->count();
+
+        $projectRecent = \App\Models\FinalProjectTask::where(
+            'user_id',
+            $user->id
+        )
+        ->latest()
+        ->take(5)
+        ->get();
+
 
         /*
         |--------------------------------------------------------------------------
@@ -215,7 +239,11 @@ Route::middleware('auth')->group(function () {
             'docsDone',
             'docsTotal',
             'recentDaily',
-            'recentDocs'
+            'recentDocs',
+            'projectDone',
+            'projectTotal',
+            'projectOnProgress',
+            'projectRecent'
         ));
 
     })->name('dashboard');
@@ -350,6 +378,48 @@ Route::middleware('auth')->group(function () {
         SupportingDocumentController::class,
         'destroy'
     ])->name('supporting-documents.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PEMANTAUAN PROYEK AKHIR
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/final-project', [
+        FinalProjectTaskController::class,
+        'index'
+    ])->name('final-project.index');
+
+    Route::get('/final-project/create', [
+        FinalProjectTaskController::class,
+        'create'
+    ])->name('final-project.create');
+
+    Route::post('/final-project', [
+        FinalProjectTaskController::class,
+        'store'
+    ])->name('final-project.store');
+
+    Route::get('/final-project/{id}/edit', [
+        FinalProjectTaskController::class,
+        'edit'
+    ])->name('final-project.edit');
+
+    Route::put('/final-project/{id}', [
+        FinalProjectTaskController::class,
+        'update'
+    ])->name('final-project.update');
+
+    Route::patch('/final-project/{id}/status', [
+        FinalProjectTaskController::class,
+        'updateStatus'
+    ])->name('final-project.status');
+
+    Route::delete('/final-project/{id}', [
+        FinalProjectTaskController::class,
+        'destroy'
+    ])->name('final-project.destroy');
 
 
     /*

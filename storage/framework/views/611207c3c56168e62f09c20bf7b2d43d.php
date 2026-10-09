@@ -246,7 +246,7 @@
                     
                     
 
-                    <div class="card-body">
+                    <div class="card-body p-2">
 
                         <div class="small text-muted mb-2">
 
@@ -272,7 +272,10 @@
                     
                     
 
-                    <div class="d-flex align-items-center gap-2 mt-3">
+                    <div 
+                    class="d-flex align-items-center gap-2 p-3"
+                    style="position: relative; top: -8px;"
+                    >
                         
                         <a
                             href="<?php echo e(route('documentation.download', $item->id)); ?>"
@@ -326,6 +329,8 @@
                         <p class="text-muted mb-0">
                             Upload dokumentasi kegiatan magang menggunakan form di atas.
                         </p>
+
+                        <div class="card-body pb-3">
 
                     </div>
 

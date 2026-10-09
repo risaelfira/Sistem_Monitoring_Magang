@@ -9,13 +9,57 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $items = Documentation::where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $sort = $request->query('sort', 'latest');
 
-        return view('documentation.index', compact('items'));
+        // Ambil dokumentasi milik pengguna
+        $items = Documentation::where('user_id', Auth::id())
+            ->get();
+        
+        // Urut berdasarkan pilihan filter
+        switch ($sort) {
+            case 'oldest':
+                $items = $items->sortBy('created_at');
+                break;
+            case 'az':
+                $items = $items->sortBy(
+                    fn ($item) => mb_strtolower(trim($item->description ?? ''))
+                );
+                break;
+            case 'za':
+                $items = $items->sortByDesc(
+                    fn ($item) => mb_strtolower(trim($item->description ?? ''))
+                );
+                break;
+            case 'week_asc':
+                $items = $items->sortBy(function ($item) {
+                    $title = $item->description ?? '';
+
+                    if (preg_match('/Minggu\s*(\d+)/i', $title, $matches)) {
+                        return (int) $matches[1];
+                    }
+                    return PHP_INT_MAX;
+                });
+                break;
+            case 'week_desc':
+                // Urutkan angka minggu dari besar ke kecil
+                $items = $items->sortBy(function ($item) {
+                    $title = $item->description ?? '';
+
+                    if (preg_match('/Minggu\s*(\d+)/i', $title, $matches)) {
+                        return -(int) $matches[1];
+                    }
+
+                    return PHP_INT_MAX;
+                });
+                break;
+            default:
+                $items = $items->sortByDesc('created_at');
+                break;
+        }
+
+        return view('documentation.index', compact('items', 'sort'));
     }
 
     public function store(Request $request)

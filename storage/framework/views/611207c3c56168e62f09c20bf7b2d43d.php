@@ -169,13 +169,59 @@
 
     <div class="mb-3">
 
-        <h5 class="fw-bold mb-1">
-            Dokumentasi Saya
-        </h5>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
 
-        <p class="text-muted mb-0">
-            Dokumentasi kegiatan magang yang telah diupload.
-        </p>
+            <div>
+                <h4 class="fw-bold mb-1">Dokumentasi Saya</h4>
+                <p class="text-muted mb-0">
+                    Dokumentasi kegiatan magang yang telah diupload.
+                </p>
+            </div>
+
+            <form
+                action="<?php echo e(route('documentation.index')); ?>"
+                method="GET"
+                class="d-flex align-items-center gap-2"
+            >
+                <label for="sort" class="text-muted text-nowrap">
+                    Urutkan:
+                </label>
+
+                <select
+                    name="sort"
+                    id="sort"
+                    class="form-select"
+                    style="width: 190px;"
+                    onchange="this.form.submit()"
+                >
+                    <option value="latest" <?php if($sort === 'latest'): echo 'selected'; endif; ?>>
+                        Terbaru
+                    </option>
+
+                    <option value="oldest" <?php if($sort === 'oldest'): echo 'selected'; endif; ?>>
+                        Terlama
+                    </option>
+
+                    <option value="az" <?php if($sort === 'az'): echo 'selected'; endif; ?>>
+                        Nama A–Z
+                    </option>
+
+                    <option value="za" <?php if($sort === 'za'): echo 'selected'; endif; ?>>
+                        Nama Z–A
+                    </option>
+
+                    <option value="week_asc" <?php if($sort === 'week_asc'): echo 'selected'; endif; ?>>
+                        Minggu 1–20
+                    </option>
+
+                    <option value="week_desc" <?php if($sort === 'week_desc'): echo 'selected'; endif; ?>>
+                        Minggu 20–1
+                    </option>
+                </select>
+            </form>
+
+        </div>
+
 
     </div>
 

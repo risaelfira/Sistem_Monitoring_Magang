@@ -171,13 +171,59 @@
 
     <div class="mb-3">
 
-        <h5 class="fw-bold mb-1">
-            Dokumentasi Saya
-        </h5>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
 
-        <p class="text-muted mb-0">
-            Dokumentasi kegiatan magang yang telah diupload.
-        </p>
+            <div>
+                <h4 class="fw-bold mb-1">Dokumentasi Saya</h4>
+                <p class="text-muted mb-0">
+                    Dokumentasi kegiatan magang yang telah diupload.
+                </p>
+            </div>
+
+            <form
+                action="{{ route('documentation.index') }}"
+                method="GET"
+                class="d-flex align-items-center gap-2"
+            >
+                <label for="sort" class="text-muted text-nowrap">
+                    Urutkan:
+                </label>
+
+                <select
+                    name="sort"
+                    id="sort"
+                    class="form-select"
+                    style="width: 190px;"
+                    onchange="this.form.submit()"
+                >
+                    <option value="latest" @selected($sort === 'latest')>
+                        Terbaru
+                    </option>
+
+                    <option value="oldest" @selected($sort === 'oldest')>
+                        Terlama
+                    </option>
+
+                    <option value="az" @selected($sort === 'az')>
+                        Nama A–Z
+                    </option>
+
+                    <option value="za" @selected($sort === 'za')>
+                        Nama Z–A
+                    </option>
+
+                    <option value="week_asc" @selected($sort === 'week_asc')>
+                        Minggu 1–20
+                    </option>
+
+                    <option value="week_desc" @selected($sort === 'week_desc')>
+                        Minggu 20–1
+                    </option>
+                </select>
+            </form>
+
+        </div>
+
 
     </div>
 

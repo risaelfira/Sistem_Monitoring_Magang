@@ -197,11 +197,11 @@
                     onchange="this.form.submit()"
                 >
                     <option value="latest" @selected($sort === 'latest')>
-                        Terbaru
+                        Latest
                     </option>
 
                     <option value="oldest" @selected($sort === 'oldest')>
-                        Terlama
+                        Oldest
                     </option>
 
                     <option value="az" @selected($sort === 'az')>

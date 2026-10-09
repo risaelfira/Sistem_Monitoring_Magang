@@ -12,11 +12,17 @@ class DocumentationController extends Controller
     public function index(Request $request)
     {
         $sort = $request->query('sort', 'latest');
+        $search = trim($request->query('search', ''));
 
         // Ambil dokumentasi milik pengguna
-        $items = Documentation::where('user_id', Auth::id())
-            ->get();
+        $query = Documentation::where('user_id', Auth::id());
         
+        if ($search !== ''){
+            $query->where('description', 'like', '%' . $search . '%');
+        }
+        
+        $items = $query->get();
+
         // Urut berdasarkan pilihan filter
         switch ($sort) {
             case 'oldest':
@@ -59,7 +65,7 @@ class DocumentationController extends Controller
                 break;
         }
 
-        return view('documentation.index', compact('items', 'sort'));
+        return view('documentation.index', compact('items', 'sort', 'search'));
     }
 
     public function store(Request $request)

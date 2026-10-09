@@ -174,7 +174,7 @@
             <div>
                 <h4 class="fw-bold mb-1">Dokumentasi Saya</h4>
                 <p class="text-muted mb-0">
-                    Dokumentasi kegiatan magang yang telah diupload.
+                    Dokumentasi kegiatan magang.
                 </p>
             </div>
 
@@ -183,10 +183,31 @@
                 method="GET"
                 class="d-flex align-items-center gap-2"
             >
+
+                
+                <div class="input-group" style="width: 250px">
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Cari dokumentasi..."
+                        value="<?php echo e($search); ?>"
+                        aria-label="Cari dokumentasi"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+
                 <label for="sort" class="text-muted text-nowrap">
                     Urutkan:
                 </label>
 
+                
                 <select
                     name="sort"
                     id="sort"
@@ -195,11 +216,11 @@
                     onchange="this.form.submit()"
                 >
                     <option value="latest" <?php if($sort === 'latest'): echo 'selected'; endif; ?>>
-                        Terbaru
+                        Latest
                     </option>
 
                     <option value="oldest" <?php if($sort === 'oldest'): echo 'selected'; endif; ?>>
-                        Terlama
+                        Oldest
                     </option>
 
                     <option value="az" <?php if($sort === 'az'): echo 'selected'; endif; ?>>

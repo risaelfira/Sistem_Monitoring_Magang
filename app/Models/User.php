@@ -11,6 +11,7 @@ use App\Models\WeeklyProgressDetail;
 use App\Models\Documentation;
 use App\Models\ReportProgress;
 use App\Models\SupportingDocument;
+use App\Models\FinalProjectTask;
 
 class User extends Authenticatable
 {
@@ -105,4 +106,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(SupportingDocument::class);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELASI PEMANTAUAN PROYEK AKHIR
+    |--------------------------------------------------------------------------
+    */
+
+    public function finalProjectTasks()
+    {
+        return $this->hasMany(FinalProjectTask::class, 'user_id');
+    }
+
 }

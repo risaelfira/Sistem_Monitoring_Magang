@@ -1404,6 +1404,97 @@
     </script>
 
 
+
+    <!-- =========================================================
+         CLIENT-SIDE TIME
+    ========================================================== -->
+
+    <script>
+        /*
+         * Semua form aplikasi mendapatkan waktu dari browser.
+         * Format yang dikirim: ISO-8601 + timezone offset.
+         * Contoh: 2026-10-12T09:15:30+07:00
+         */
+        (function () {
+            function pad(value) {
+                return String(value).padStart(2, '0');
+            }
+
+            function getClientDateTime() {
+                const now = new Date();
+                const offsetMinutes = -now.getTimezoneOffset();
+                const sign = offsetMinutes >= 0 ? '+' : '-';
+                const absOffset = Math.abs(offsetMinutes);
+                const offsetHours = pad(Math.floor(absOffset / 60));
+                const offsetMinutesPart = pad(absOffset % 60);
+
+                return [
+                    now.getFullYear(),
+                    pad(now.getMonth() + 1),
+                    pad(now.getDate())
+                ].join('-') + 'T' + [
+                    pad(now.getHours()),
+                    pad(now.getMinutes()),
+                    pad(now.getSeconds())
+                ].join(':') + sign + offsetHours + ':' + offsetMinutesPart;
+            }
+
+            function getClientDate() {
+                const now = new Date();
+
+                return [
+                    now.getFullYear(),
+                    pad(now.getMonth() + 1),
+                    pad(now.getDate())
+                ].join('-');
+            }
+
+            function attachClientTime(form) {
+                let input = form.querySelector('input[name="client_datetime"]');
+
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'client_datetime';
+                    form.appendChild(input);
+                }
+
+                input.value = getClientDateTime();
+            }
+
+            function initializeClientTime() {
+                /*
+                 * Set tanggal default pada form progres harian berdasarkan
+                 * tanggal perangkat/browser, bukan now() dari server.
+                 */
+                document.querySelectorAll(
+                    'input[type="date"][name="date"]'
+                ).forEach(function (input) {
+                    if (!input.value) {
+                        input.value = getClientDate();
+                    }
+                });
+
+                /*
+                 * Set timezone browser sebagai informasi yang dapat
+                 * digunakan oleh JavaScript pada halaman.
+                 */
+                document.documentElement.dataset.clientTimezone =
+                    Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                initializeClientTime();
+
+                document.querySelectorAll('form').forEach(function (form) {
+                    form.addEventListener('submit', function () {
+                        attachClientTime(form);
+                    });
+                });
+            });
+        })();
+    </script>
+
     <!-- =========================================================
          MOBILE SIDEBAR SCRIPT
     ========================================================== -->

@@ -78,11 +78,18 @@ class DocumentationController extends Controller
         $path = $request->file('image')
             ->store('documentation', 'public');
 
-        Documentation::create([
+        $clientNow = $this->clientNow($request);
+
+        $documentation = Documentation::create([
             'user_id' => Auth::id(),
             'image_path' => $path,
             'description' => $request->description,
         ]);
+
+        $documentation->forceFill([
+            'created_at' => $clientNow,
+            'updated_at' => $clientNow,
+        ])->saveQuietly();
 
         return redirect()
             ->route('documentation.index')

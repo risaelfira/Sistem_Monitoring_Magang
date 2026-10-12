@@ -1,236 +1,683 @@
-<?php
+@extends('layouts.app')
 
-namespace App\Http\Controllers;
+@section('content')
 
-use App\Models\WeeklyProgress;
-use App\Models\WeeklyProgressDetail;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+<style>
 
-class WeeklyProgressController extends Controller
-{
-    /*
-    |--------------------------------------------------------------------------
-    | INDEX
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       DAILY PROGRESS PAGE
+    ========================================================= */
 
-    public function index()
-    {
-        $items = WeeklyProgress::where(
-            'user_id',
-            Auth::id()
-        )
-        ->with('details')
-        ->orderBy('week_number', 'asc')
-        ->get();
-
-        return view('weekly.index', compact('items'));
+    .daily-page {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE MINGGU
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       HEADER
+    ========================================================= */
 
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'week_number' => 'required|integer|min:1',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'activities' => 'required|string',
-            'insights' => 'required|string',
-            'tasks' => 'required|string',
-        ]);
+    .daily-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-        $data['user_id'] = Auth::id();
+        gap: 24px;
 
-        $clientNow = $this->clientNow($request);
+        margin-bottom: 24px;
+    }
 
-        $weeklyProgress = WeeklyProgress::create($data);
+    .daily-page-title {
+        min-width: 0;
+    }
 
-        $weeklyProgress->forceFill([
-            'created_at' => $clientNow,
-            'updated_at' => $clientNow,
-        ])->saveQuietly();
+    .daily-page-title h3 {
+        margin: 0 0 6px 0;
 
-        return redirect()
-            ->route('weekly-progress.index')
-            ->with(
-                'success',
-                'Progres minggu berhasil ditambahkan.'
-            );
+        font-size: 28px;
+        line-height: 1.25;
+
+        font-weight: 800;
+
+        color: #172033;
+
+        overflow-wrap: anywhere;
+    }
+
+    .daily-page-title p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .daily-add-button {
+        flex-shrink: 0;
+
+        white-space: nowrap;
+
+        padding: 10px 18px;
+
+        border-radius: 8px;
+
+        font-weight: 600;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | SHOW DETAIL MINGGU
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       DAILY ITEM
+    ========================================================= */
 
-    public function show($id)
-    {
-        $weeklyProgress = WeeklyProgress::where(
-            'user_id',
-            Auth::id()
-        )
-        ->with('details')
-        ->findOrFail($id);
+    .daily-item {
+        background: #ffffff;
 
-        return view(
-            'weekly.show',
-            compact('weeklyProgress')
-        );
+        border-radius: 16px;
+
+        padding: 28px;
+
+        margin-bottom: 16px;
+
+        box-shadow:
+            0 4px 20px rgba(15, 23, 42, 0.06);
+
+        display: grid;
+
+        grid-template-columns:
+            150px
+            minmax(0, 1fr)
+            auto;
+
+        column-gap: 28px;
+
+        align-items: center;
+
+        width: 100%;
+
+        min-width: 0;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE MINGGU
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       DATE
+    ========================================================= */
 
-    public function update(Request $request, $id)
-    {
-        $weeklyProgress = WeeklyProgress::where(
-            'user_id',
-            Auth::id()
-        )->findOrFail($id);
+    .daily-date {
+        min-width: 0;
+    }
 
-        $data = $request->validate([
-            'week_number' => 'required|integer|min:1',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'activities' => 'required|string',
-            'insights' => 'required|string',
-            'tasks' => 'required|string',
-        ]);
+    .daily-date-date {
+        color: #64748b;
 
-        $weeklyProgress->update($data);
+        font-size: 14px;
 
-        return redirect()
-            ->route(
-                'weekly-progress.show',
-                $weeklyProgress->id
-            )
-            ->with(
-                'success',
-                'Progres minggu berhasil diperbarui.'
-            );
+        line-height: 1.4;
+
+        margin-bottom: 4px;
+
+        white-space: nowrap;
+    }
+
+    .daily-date-day {
+        color: #172033;
+
+        font-size: 18px;
+
+        font-weight: 700;
+
+        line-height: 1.3;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE MINGGU
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       DESCRIPTION
+    ========================================================= */
 
-    public function destroy($id)
-    {
-        $weeklyProgress = WeeklyProgress::where(
-            'user_id',
-            Auth::id()
-        )->findOrFail($id);
+    .daily-content {
+        min-width: 0;
 
-        $weeklyProgress->delete();
+        overflow: hidden;
+    }
 
-        return redirect()
-            ->route('weekly-progress.index')
-            ->with(
-                'success',
-                'Progres minggu berhasil dihapus.'
-            );
+    .daily-content-title {
+        margin: 0 0 10px 0;
+
+        color: #252525;
+
+        font-size: 21px;
+
+        font-weight: 800;
+
+        line-height: 1.3;
+
+        overflow-wrap: anywhere;
+
+        word-break: normal;
+    }
+
+    .daily-content-description {
+        margin: 0;
+
+        color: #6b7280;
+
+        font-size: 16px;
+
+        line-height: 1.6;
+
+        overflow-wrap: anywhere;
+
+        word-break: normal;
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE DETAIL HARIAN
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       ACTIONS
+    ========================================================= */
 
-    public function storeDetail(
-        Request $request,
-        $weeklyProgressId
-    ) {
-        $weeklyProgress = WeeklyProgress::where(
-            'user_id',
-            Auth::id()
-        )->findOrFail($weeklyProgressId);
+    .daily-actions {
+        min-width: 190px;
 
-        $data = $request->validate([
-            'date' => 'required|date',
-            'activity' => 'required|string',
-            'task' => 'nullable|string',
-        ]);
+        display: flex;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pastikan tanggal berada dalam periode minggu
-        |--------------------------------------------------------------------------
-        */
+        align-items: center;
 
-        $date = \Carbon\Carbon::parse($data['date']);
+        justify-content: flex-end;
 
-        if (
-            $date->lt($weeklyProgress->start_date) ||
-            $date->gt($weeklyProgress->end_date)
-        ) {
-            return back()
-                ->withErrors([
-                    'date' =>
-                        'Tanggal harus berada dalam periode minggu tersebut.'
-                ])
-                ->withInput();
+        gap: 6px;
+
+        flex-wrap: wrap;
+    }
+
+    .daily-actions form {
+        margin: 0;
+
+        display: inline-flex;
+    }
+
+    .daily-actions .btn {
+        white-space: nowrap;
+
+        flex-shrink: 0;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .daily-empty {
+        background: #ffffff;
+
+        border-radius: 16px;
+
+        padding: 50px 24px;
+
+        text-align: center;
+
+        color: #64748b;
+
+        box-shadow:
+            0 4px 20px rgba(15, 23, 42, 0.06);
+    }
+
+
+    /* =========================================================
+       PAGINATION
+    ========================================================= */
+
+    .daily-pagination {
+        margin-top: 24px;
+    }
+
+
+    /* =========================================================
+       TABLET
+       768px - 991px
+    ========================================================= */
+
+    @media (max-width: 991.98px) {
+
+        .daily-page-header {
+            align-items: flex-start;
         }
 
-        $data['weekly_progress_id'] = $weeklyProgress->id;
-        $data['user_id'] = Auth::id();
+        .daily-page-title h3 {
+            font-size: 25px;
+        }
 
-        WeeklyProgressDetail::create($data);
+        .daily-item {
 
-        return redirect()
-            ->route(
-                'weekly-progress.show',
-                $weeklyProgress->id
-            )
-            ->with(
-                'success',
-                'Detail kegiatan berhasil ditambahkan.'
-            );
+            grid-template-columns:
+                125px
+                minmax(0, 1fr);
+
+            column-gap: 20px;
+
+            row-gap: 20px;
+
+            align-items: start;
+
+            padding: 24px;
+        }
+
+        .daily-date {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .daily-content {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .daily-actions {
+            grid-column: 1 / -1;
+            grid-row: 2;
+
+            justify-content: flex-end;
+
+            min-width: 0;
+
+            padding-top: 4px;
+
+            border-top: 1px solid #eef0f4;
+        }
+
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE DETAIL HARIAN
-    |--------------------------------------------------------------------------
-    */
+    /* =========================================================
+       MOBILE
+       <= 767px
+    ========================================================= */
 
-    public function destroyDetail($id)
-    {
-        $detail = WeeklyProgressDetail::where(
-            'user_id',
-            Auth::id()
-        )->findOrFail($id);
+    @media (max-width: 767.98px) {
 
-        $weeklyProgressId = $detail->weekly_progress_id;
+        .daily-page-header {
+            flex-direction: column;
 
-        $detail->delete();
+            align-items: stretch;
 
-        return redirect()
-            ->route(
-                'weekly-progress.show',
-                $weeklyProgressId
-            )
-            ->with(
-                'success',
-                'Detail kegiatan berhasil dihapus.'
-            );
+            gap: 16px;
+
+            margin-bottom: 20px;
+        }
+
+        .daily-page-title h3 {
+            font-size: 23px;
+        }
+
+        .daily-page-title p {
+            font-size: 14px;
+        }
+
+        .daily-add-button {
+            width: 100%;
+
+            text-align: center;
+
+            padding: 11px 16px;
+        }
+
+
+        /* CARD */
+
+        .daily-item {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: stretch;
+
+            gap: 16px;
+
+            padding: 20px;
+
+            border-radius: 14px;
+        }
+
+
+        /* DATE */
+
+        .daily-date {
+            width: 100%;
+        }
+
+        .daily-date-date {
+            font-size: 13px;
+        }
+
+        .daily-date-day {
+            font-size: 17px;
+        }
+
+
+        /* CONTENT */
+
+        .daily-content {
+            width: 100%;
+        }
+
+        .daily-content-title {
+            font-size: 19px;
+
+            line-height: 1.35;
+
+            margin-bottom: 8px;
+        }
+
+        .daily-content-description {
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* ACTIONS */
+
+        .daily-actions {
+
+            width: 100%;
+
+            min-width: 0;
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 8px;
+
+            justify-content: stretch;
+
+            padding-top: 16px;
+
+            border-top: 1px solid #eef0f4;
+        }
+
+        .daily-actions .btn {
+            width: 100%;
+
+            min-height: 38px;
+        }
+
+        .daily-actions a:first-child {
+
+            grid-column: 1 / -1;
+        }
+
+        .daily-actions form {
+
+            width: 100%;
+        }
+
+        .daily-actions form .btn {
+
+            width: 100%;
+        }
+
     }
-}
+
+
+    /* =========================================================
+       SMALL MOBILE
+       <= 575px
+    ========================================================= */
+
+    @media (max-width: 575.98px) {
+
+        .daily-page-title h3 {
+            font-size: 21px;
+        }
+
+        .daily-page-title p {
+            font-size: 14px;
+        }
+
+        .daily-item {
+            padding: 17px;
+
+            margin-bottom: 14px;
+        }
+
+        .daily-content-title {
+            font-size: 18px;
+        }
+
+        .daily-content-description {
+            font-size: 14px;
+        }
+
+        .daily-actions {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL MOBILE
+       <= 380px
+    ========================================================= */
+
+    @media (max-width: 380px) {
+
+        .daily-item {
+            padding: 15px;
+        }
+
+        .daily-content-title {
+            font-size: 17px;
+        }
+
+        .daily-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .daily-actions a:first-child {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+
+<div class="daily-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="daily-page-header">
+
+
+        <div class="daily-page-title">
+
+            <h3>
+                Progres Harian Tugas Akhir
+            </h3>
+
+            <p>
+                Dokumentasikan proses pembuatan dashboard setiap hari.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ route('daily-progress.create') }}"
+            class="btn btn-primary daily-add-button"
+        >
+
+            <i class="bi bi-plus-lg me-1"></i>
+
+            Tambah Progres
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         DAILY PROGRESS LIST
+    ====================================================== -->
+
+    @forelse($items as $i)
+
+
+        <div class="daily-item">
+
+
+            <!-- =================================================
+                 DATE
+            ================================================== -->
+
+            <div class="daily-date">
+
+                <div class="daily-date-date">
+
+                    {{ $i->date->format('d M Y') }}
+
+                </div>
+
+                <div class="daily-date-day">
+
+                    {{ $i->date->format('l') }}
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CONTENT
+            ================================================== -->
+
+            <div class="daily-content">
+
+                <h5 class="daily-content-title">
+
+                    {{ $i->short_description }}
+
+                </h5>
+
+
+                <p class="daily-content-description">
+
+                    {{ Str::limit($i->detailed_description, 220) }}
+
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="daily-actions">
+
+
+                @if($i->screenshot_path)
+
+                    <a
+                        target="_blank"
+                        href="{{ Storage::url($i->screenshot_path) }}"
+                        class="btn btn-sm btn-outline-secondary"
+                    >
+
+                        <i class="bi bi-image me-1"></i>
+
+                        Lihat Bukti
+
+                    </a>
+
+                @endif
+
+
+                <a
+                    href="{{ route('daily-progress.edit', $i) }}"
+                    class="btn btn-sm btn-outline-primary"
+                >
+
+                    <i class="bi bi-pencil me-1"></i>
+
+                    Edit
+
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ route('daily-progress.destroy', $i) }}"
+                >
+
+                    @csrf
+
+                    @method('DELETE')
+
+                    <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Apakah kamu yakin ingin menghapus progres ini?')"
+                    >
+
+                        <i class="bi bi-trash me-1"></i>
+
+                        Hapus
+
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+
+    @empty
+
+
+        <div class="daily-empty">
+
+            <i
+                class="bi bi-journal-text"
+                style="font-size: 36px;"
+            ></i>
+
+            <div class="mt-3">
+
+                Belum ada progres harian.
+
+            </div>
+
+        </div>
+
+
+    @endforelse
+
+
+    <!-- =====================================================
+         PAGINATION
+    ====================================================== -->
+
+    @if($items->hasPages())
+
+        <div class="daily-pagination">
+
+            {{ $items->links() }}
+
+        </div>
+
+    @endif
+
+
+</div>
+
+@endsection

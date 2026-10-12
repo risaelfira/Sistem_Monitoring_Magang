@@ -89,11 +89,25 @@ class DailyProgressController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | Waktu dari sisi klien/browser
+        |--------------------------------------------------------------------------
+        */
+
+        $clientNow = $this->clientNow($request);
+
+        /*
+        |--------------------------------------------------------------------------
         | Simpan Data
         |--------------------------------------------------------------------------
         */
 
-        DailyProgress::create($data);
+        $dailyProgress = DailyProgress::create($data);
+
+        // created_at/updated_at diisi eksplisit agar tidak terkena mass assignment.
+        $dailyProgress->forceFill([
+            'created_at' => $clientNow,
+            'updated_at' => $clientNow,
+        ])->saveQuietly();
 
 
         return redirect()
@@ -180,6 +194,10 @@ class DailyProgressController extends Controller
         */
 
         $daily_progress->update($data);
+
+        $daily_progress->forceFill([
+            'updated_at' => $this->clientNow($request),
+        ])->saveQuietly();
 
 
         return redirect()

@@ -44,7 +44,14 @@ class SupportingDocumentController extends Controller
 
         $validated['user_id'] = Auth::id();
 
-        SupportingDocument::create($validated);
+        $clientNow = $this->clientNow($request);
+
+        $document = SupportingDocument::create($validated);
+
+        $document->forceFill([
+            'created_at' => $clientNow,
+            'updated_at' => $clientNow,
+        ])->saveQuietly();
 
         return redirect()
             ->route('supporting-documents.index')
@@ -88,6 +95,10 @@ class SupportingDocumentController extends Controller
         ]);
 
         $supportingDocument->update($validated);
+
+        $supportingDocument->forceFill([
+            'updated_at' => $this->clientNow($request),
+        ])->saveQuietly();
 
         return redirect()
             ->route('supporting-documents.index')

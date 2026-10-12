@@ -57,7 +57,14 @@ class FinalProjectTaskController extends Controller
 
         $data['user_id'] = Auth::id();
 
-        FinalProjectTask::create($data);
+        $clientNow = $this->clientNow($request);
+
+        $task = FinalProjectTask::create($data);
+
+        $task->forceFill([
+            'created_at' => $clientNow,
+            'updated_at' => $clientNow,
+        ])->saveQuietly();
 
         return redirect()
             ->route('final-project.index')
@@ -88,6 +95,10 @@ class FinalProjectTaskController extends Controller
 
         $task->update($data);
 
+        $task->forceFill([
+            'updated_at' => $this->clientNow($request),
+        ])->saveQuietly();
+
         return redirect()
             ->route('final-project.index')
             ->with('success', 'Kegiatan proyek akhir berhasil diperbarui.');
@@ -106,14 +117,22 @@ class FinalProjectTaskController extends Controller
         $newStatus = $request->status;
 
         if ($oldStatus !== $newStatus) {
-            $task->update(['status' => $newStatus]);
+            $clientNow = $this->clientNow($request);
+
+            $task->update([
+                'status' => $newStatus,
+            ]);
+
+            $task->forceFill([
+                'updated_at' => $clientNow,
+            ])->saveQuietly();
 
             FinalProjectTaskStatusHistory::create([
                 'final_project_task_id' => $task->id,
                 'user_id' => Auth::id(),
                 'from_status' => $oldStatus,
                 'to_status' => $newStatus,
-                'changed_at' => now(),
+                'changed_at' => $clientNow,
             ]);
         }
 

@@ -12,7 +12,7 @@
         </h3>
 
         <p class="text-muted mb-0">
-            Upload foto kegiatan magang. Tanggal upload dicatat secara otomatis.
+            Upload foto kegiatan magang. Tanggal dan waktu upload mengikuti waktu perangkat/browser.
         </p>
 
     </div>

@@ -84,6 +84,9 @@ class ReportProgressController extends Controller
         // Simpan status
         $progress->status = $request->status;
 
+        // Waktu perubahan mengikuti waktu perangkat/browser.
+        $progress->updated_at = $this->clientNow($request);
+
         // Simpan perubahan
         $progress->save();
 

@@ -48,7 +48,14 @@ class WeeklyProgressController extends Controller
 
         $data['user_id'] = Auth::id();
 
-        WeeklyProgress::create($data);
+        $clientNow = $this->clientNow($request);
+
+        $weeklyProgress = WeeklyProgress::create($data);
+
+        $weeklyProgress->forceFill([
+            'created_at' => $clientNow,
+            'updated_at' => $clientNow,
+        ])->saveQuietly();
 
         return redirect()
             ->route('weekly-progress.index')

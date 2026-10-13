@@ -439,6 +439,11 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
+    Route::get('/daily-progress/{daily_progress}/download', [
+        DailyProgressController::class,
+        'download'
+    ])->name('daily-progress.download');
+
     Route::resource('/daily-progress', DailyProgressController::class)
         ->except(['show'])
         ->names('daily-progress');

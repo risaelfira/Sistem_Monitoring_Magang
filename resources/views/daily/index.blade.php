@@ -673,6 +673,14 @@
 
                     </a>
 
+                    <a
+                        href="{{ route('daily-progress.download', $i) }}"
+                        class="btn btn-sm btn-outline-success"
+                    >
+                        <i class="bi bi-download me-1"></i>
+                        Download Gambar
+                    </a>
+
                 @endif
 
 

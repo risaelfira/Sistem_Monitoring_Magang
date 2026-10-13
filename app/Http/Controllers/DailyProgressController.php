@@ -248,6 +248,35 @@ class DailyProgressController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | DOWNLOAD SCREENSHOT
+    |--------------------------------------------------------------------------
+    */
+
+    public function download(DailyProgress $daily_progress)
+    {
+        abort_unless(
+            $daily_progress->user_id === Auth::id(),
+            403
+        );
+
+        abort_unless(
+            $daily_progress->screenshot_path &&
+            Storage::disk('public')->exists($daily_progress->screenshot_path),
+            404,
+            'Gambar progres harian tidak ditemukan.'
+        );
+
+        $filename = basename($daily_progress->screenshot_path);
+
+        return response()->download(
+            storage_path('app/public/' . $daily_progress->screenshot_path),
+            $filename
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | DESTROY
     |--------------------------------------------------------------------------
     */

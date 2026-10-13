@@ -6,6 +6,7 @@ use App\Models\Documentation;
 use App\Models\DailyProgress;
 use App\Support\ImageDuplicateChecker;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -83,6 +84,25 @@ class DocumentationController extends Controller
                 })->values(); break;
             default: $items = $items->sortByDesc('created_at')->values(); break;
         }
+
+        // Pagination dilakukan setelah seluruh filter dan pengurutan diterapkan.
+        // Ini penting karena galeri menggabungkan dua sumber data (Documentation dan DailyProgress).
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $total = $items->count();
+        $pageItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $items = new LengthAwarePaginator(
+            $pageItems,
+            $total,
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+        $items->appends($request->except('page'));
 
         return view('documentation.index', compact('items', 'sort', 'search', 'source'));
     }

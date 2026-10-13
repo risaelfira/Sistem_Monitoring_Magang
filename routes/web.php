@@ -314,6 +314,17 @@ Route::middleware('auth')->group(function () {
     ])->name('documentation.store');
 
 
+    Route::get('/documentation/{documentation}/edit', [
+        DocumentationController::class,
+        'edit'
+    ])->name('documentation.edit');
+
+    Route::put('/documentation/{documentation}', [
+        DocumentationController::class,
+        'update'
+    ])->name('documentation.update');
+
+
     Route::delete('/documentation/{documentation}', [
         DocumentationController::class,
         'destroy'

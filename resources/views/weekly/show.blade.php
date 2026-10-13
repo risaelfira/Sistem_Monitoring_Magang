@@ -281,6 +281,10 @@
                         </div>
 
 
+                        <a href="{{ route('weekly-progress.details.edit', $detail->id) }}" class="btn btn-sm btn-outline-warning me-2">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+
                         <form
                             action="{{ route('weekly-progress.details.destroy', $detail->id) }}"
                             method="POST"

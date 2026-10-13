@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
 
-    <title>{{ $title ?? 'Monitoring Magang' }}</title>
+    <title>{{ $title ?? 'Monitoring Akhir ' }}</title>
 
     <!-- Bootstrap -->
     <link
@@ -906,7 +906,7 @@
                 <i class="bi bi-activity"></i>
 
                 <span>
-                    Monitoring Magang
+                    Monitoring Akhir 
                 </span>
 
             </div>
@@ -966,11 +966,11 @@
 
 
             <!-- =================================================
-                 LAPORAN
+                 Laporan Magang
             ================================================== -->
 
             <div class="sidebar-section label">
-                Laporan
+                Laporan Magang
             </div>
 
 
@@ -1003,11 +1003,11 @@
 
 
             <!-- =================================================
-                 TUGAS AKHIR
+                 Tugas Akhir Magang
             ================================================== -->
 
             <div class="sidebar-section label">
-                Tugas Akhir
+                Tugas Akhir Magang
             </div>
 
 

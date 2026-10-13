@@ -205,6 +205,41 @@
 
 
     /* =========================================================
+       FILTER
+    ========================================================= */
+
+    .daily-filter-panel {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: #ffffff;
+        padding: 18px;
+        margin-bottom: 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .daily-filter-field {
+        flex: 1 1 260px;
+        min-width: 220px;
+    }
+
+    .daily-filter-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .daily-filter-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    /* =========================================================
        EMPTY STATE
     ========================================================= */
 
@@ -524,6 +559,47 @@
 
 
     <!-- =====================================================
+         FILTER PROGRES HARIAN PER MINGGU
+    ====================================================== -->
+
+    <form method="GET" action="{{ route('daily-progress.index') }}" class="daily-filter-panel">
+        <div class="daily-filter-field">
+            <label for="week">Filter berdasarkan minggu</label>
+            <select name="week" id="week" class="form-select">
+                <option value="">Semua Minggu</option>
+                @for($weekNumber = 1; $weekNumber <= 20; $weekNumber++)
+                    @php $period = $weekRanges[$weekNumber] ?? null; @endphp
+                    <option value="{{ $weekNumber }}" @selected((string) $selectedWeek === (string) $weekNumber)>
+                        Minggu {{ $weekNumber }}{{ $period ? ' — ' . \Carbon\Carbon::parse(explode(' - ', $period)[0])->format('d M Y') . ' s.d. ' . \Carbon\Carbon::parse(explode(' - ', $period)[1])->format('d M Y') : ' — tanggal belum tersedia' }}
+                    </option>
+                @endfor
+            </select>
+        </div>
+        <div class="daily-filter-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-funnel me-1"></i> Terapkan Filter
+            </button>
+            <a href="{{ route('daily-progress.index') }}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+    </form>
+
+    @if($selectedWeek !== null)
+        <div class="alert alert-info py-2">
+            Menampilkan progres harian untuk <strong>Minggu {{ $selectedWeek }}</strong>.
+            @php $selectedPeriod = $weekRanges[$selectedWeek] ?? null; @endphp
+            @if($selectedPeriod)
+                @php
+                    $startDate = \Carbon\Carbon::parse(explode(' - ', $selectedPeriod)[0]);
+                    $endDate = \Carbon\Carbon::parse(explode(' - ', $selectedPeriod)[1]);
+                @endphp
+                Periode: {{ $startDate->format('d M Y') }} – {{ $endDate->format('d M Y') }}.
+            @else
+                Tanggal acuan belum tersedia. Tambahkan minimal satu progres harian atau atur periode di Progres Mingguan terlebih dahulu.
+            @endif
+        </div>
+    @endif
+
+    <!-- =====================================================
          DAILY PROGRESS LIST
     ====================================================== -->
 
@@ -653,7 +729,11 @@
 
             <div class="mt-3">
 
-                Belum ada progres harian.
+                @if($selectedWeek !== null)
+                    Belum ada progres harian pada Minggu {{ $selectedWeek }}.
+                @else
+                    Belum ada progres harian.
+                @endif
 
             </div>
 
@@ -671,7 +751,7 @@
 
         <div class="daily-pagination">
 
-            {{ $items->links() }}
+            {{ $items->onEachSide(1)->links('pagination::bootstrap-5') }}
 
         </div>
 

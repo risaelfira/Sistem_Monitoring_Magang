@@ -226,6 +226,10 @@
 
                         <div class="d-flex gap-2">
 
+                            <a href="{{ route('weekly-progress.edit', $item->id) }}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil me-1"></i> Edit
+                            </a>
+
                             <a
                                 href="{{ route('weekly-progress.show', $item->id) }}"
                                 class="btn btn-sm btn-primary">

@@ -186,8 +186,22 @@
                 class="d-flex align-items-center gap-2"
             >
 
+                {{-- Filter berdasarkan sumber/file fitur yang mengunggah gambar --}}
+                <select
+                    name="source"
+                    id="source"
+                    class="form-select"
+                    style="width: 210px;"
+                    aria-label="Filter sumber dokumentasi"
+                    onchange="this.form.submit()"
+                >
+                    <option value="all" @selected($source === 'all')>Semua Sumber</option>
+                    <option value="documentation" @selected($source === 'documentation')>File Dokumentasi</option>
+                    <option value="daily" @selected($source === 'daily')>File Progres Harian</option>
+                </select>
+
                 {{-- Pencarian Dokumentasi --}}
-                <div class="input-group" style="width: 250px">
+                <div class="input-group" style="width: 220px">
                     <span class="input-group-text bg-white">
                         <i class="bi bi-search"></i>
                     </span>
@@ -218,11 +232,11 @@
                     onchange="this.form.submit()"
                 >
                     <option value="latest" @selected($sort === 'latest')>
-                        Latest
+                        Terbaru
                     </option>
 
                     <option value="oldest" @selected($sort === 'oldest')>
-                        Oldest
+                        Terlama
                     </option>
 
                     <option value="az" @selected($sort === 'az')>
@@ -273,8 +287,8 @@
                             ">
 
                             <img
-                                src="{{ asset('storage/' . $item->image_path) }}"
-                                alt="Dokumentasi Magang"
+                                src="{{ Storage::url($item->image_path) }}"
+                                alt="Foto dokumentasi kegiatan magang"
                                 style="
                                     width: 100%;
                                     height: 100%;
@@ -321,14 +335,15 @@
 
                             <i class="bi bi-calendar3 me-1"></i>
 
-                            {{ $item->created_at->format('d M Y, H:i') }}
+                            {{ optional($item->created_at)->format('d M Y, H:i') }}
 
                         </div>
+                        <div class="mb-2"><span class="badge bg-secondary">{{ $item->source_label ?? 'Dokumentasi' }}</span></div>
 
 
                         <div class="fw-semibold">
 
-                            {{ $item->description }}
+                            {{ $item->gallery_description ?? $item->description }}
 
                         </div>
 
@@ -343,33 +358,27 @@
                     class="d-flex align-items-center gap-2 p-3"
                     style="position: relative; top: -8px;"
                     >
-                        {{-- Download --}}
-                        <a
-                            href="{{ route('documentation.download', $item->id) }}"
-                            class="btn btn-outline-primary btn-sm"
-                        >
-                            <i class="bi bi-download me-1"></i>
-                            Download
-                        </a>
-                    
-                        {{-- Delete --}}      
-                        <form
-                            action="{{ route('documentation.destroy', $item->id) }}"
-                            method="POST"
-                            class="m-0"
-                            onsubmit="return confirm('Yakin ingin menghapus dokumentasi ini?')"
-                        >
-                            @csrf
-                            @method('DELETE')
-
-                            <button
-                                type="submit"
-                                class="btn btn-sm btn-danger"
-                            >
-                                <i class="bi bi-trash me-1"></i>
-                                Delete
-                            </button>
-                        </form>
+                        {{-- Aksi mengikuti fitur asal agar tidak salah menghapus record. --}}
+                        @if(($item->source_type ?? 'documentation') === 'daily')
+                            <a href="{{ Storage::url($item->image_path) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download me-1"></i> Lihat / Unduh
+                            </a>
+                            <a href="{{ route('daily-progress.edit', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil me-1"></i> Buka Progres
+                            </a>
+                        @else
+                            <a href="{{ route('documentation.edit', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil me-1"></i> Edit
+                            </a>
+                            <a href="{{ route('documentation.download', $item->id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download me-1"></i> Download
+                            </a>
+                            <form action="{{ route('documentation.destroy', $item->id) }}" method="POST" class="m-0" onsubmit="return confirm('Yakin ingin menghapus dokumentasi ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash me-1"></i> Delete</button>
+                            </form>
+                        @endif
 
                     </div>
                 </div>
